@@ -4,7 +4,7 @@ Docs: https://magma.github.io/magma/docs/next/orc8r/deploy_using_ansible
 
 Quick Install:
 ```bash
-sudo bash -c "$(curl -sL https://github.com/magma/magma-deployer/raw/main/deploy-orc8r.sh)"
+sudo bash -c "$(curl -sL https://github.com/nitinrajput1997/magma-deployer/raw/main/deploy-orc8r.sh)"
 ```
 
 Switch to `magma` user after deployment has finsished:
