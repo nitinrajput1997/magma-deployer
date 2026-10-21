@@ -45,18 +45,24 @@ add-apt-repository --yes ppa:ansible/ansible
 apt install yq ansible -y
 
 # Create magma user and give sudo permissions
-useradd -m ${MAGMA_USER} -s /bin/bash -G sudo
-echo "${MAGMA_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+id ${MAGMA_USER} &>/dev/null || useradd -m ${MAGMA_USER} -s /bin/bash -G sudo
+grep -qxF "${MAGMA_USER} ALL=(ALL) NOPASSWD:ALL" /etc/sudoers || echo "${MAGMA_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # switch to magma user
 su - ${MAGMA_USER} -c bash <<_
+set -e
 
 # Genereta SSH key for magma user
-ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ''
-cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys 
+[ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ''
+cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
 
-# Clone Magma Deployer repo
-git clone https://github.com/${GITHUB_USERNAME}/${MAGMA_ORC8R_REPO} --depth 1
+# Clone Magma Deployer repo, or update it on re-run (keeps rke cluster state)
+if [ -d ~/${MAGMA_ORC8R_REPO}/.git ]; then
+  git -C ~/${MAGMA_ORC8R_REPO} fetch --depth 1 origin main
+  git -C ~/${MAGMA_ORC8R_REPO} reset --hard FETCH_HEAD
+else
+  git clone https://github.com/${GITHUB_USERNAME}/${MAGMA_ORC8R_REPO} --depth 1
+fi
 cd ~/${MAGMA_ORC8R_REPO}
 
 # export variables for yq

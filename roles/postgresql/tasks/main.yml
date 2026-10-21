@@ -7,6 +7,8 @@
     chart_version: "{{ postgresql_chart_version }}"
     create_namespace: true
     values:
+      image:
+        repository: "{{ postgresql_image_repository }}"
       auth:
         postgresPassword: "{{ postgresql_password }}"
         database: "{{ postgresql_database }}"
